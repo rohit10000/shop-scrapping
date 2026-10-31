@@ -1,0 +1,88 @@
+"""Configuration for Varanasi Shop Scraper & Web Agency Lead Generator."""
+
+from typing import Dict, List
+
+# Comprehensive list of major localities and commercial markets in Varanasi
+VARANASI_LOCALITIES: List[str] = [
+    "Lanka",
+    "Sigra",
+    "Durgakund",
+    "Godowlia",
+    "Chowk",
+    "Bhelupur",
+    "Mahmoorganj",
+    "Rathyatra",
+    "Pandeypur",
+    "Assi",
+    "Dashashwamedh",
+    "Chetganj",
+    "Lahurabir",
+    "Maldahiya",
+    "Nadesar",
+    "Cantonment",
+    "Orderly Bazar",
+    "Shivpur",
+    "Sarnath",
+    "Kabir Chaura",
+    "Luxa",
+    "Teliyabag",
+    "Ramnagar",
+    "Bhojubir",
+    "Sunderpur",
+    "Paharia",
+    "Kamachha",
+    "Gurubagh",
+    "Vidyapeeth Road",
+    "Bhadaini",
+]
+
+# Shop categories and their corresponding Google Maps search terms
+CATEGORIES: Dict[str, List[str]] = {
+    "all_shops": ["shops", "stores"],
+    "toy": ["toy shop", "kids toys and games store"],
+    "medicine": ["medical store", "pharmacy", "chemist"],
+    "grocery": ["grocery store", "kirana store", "supermarket", "provision store"],
+    "clothing": ["saree shop", "clothing store", "garments shop", "boutique", "textiles"],
+    "sweets_and_bakery": ["sweet shop", "mithai shop", "bakery", "cake shop"],
+    "electronics_and_mobile": ["mobile shop", "electronics store", "computer laptop shop"],
+    "jewelry": ["jewelry store", "jewellers", "gold silver jewellery"],
+    "footwear": ["shoe store", "footwear shop"],
+    "hardware_sanitary": ["hardware store", "sanitary ware shop", "electrical and hardware store"],
+    "books_and_stationery": ["stationery shop", "book store"],
+    "opticals": ["optical shop", "eyewear store", "chashma shop"],
+    "restaurant_and_cafe": ["restaurant", "cafe", "fast food"],
+    "salon_and_beauty": ["beauty parlour", "salon"],
+    "furniture_and_decor": ["furniture shop", "home decor"],
+    "automobile_and_repair": ["bike showroom", "car repair garage", "auto spare parts"],
+}
+
+# Domains considered aggregators or social media (not a true independent business website)
+SOCIAL_AND_DIRECTORY_DOMAINS = [
+    "facebook.com",
+    "fb.com",
+    "instagram.com",
+    "twitter.com",
+    "x.com",
+    "youtube.com",
+    "linkedin.com",
+    "justdial.com",
+    "indiamart.com",
+    "tradeindia.com",
+    "sulekha.com",
+    "magicbricks.com",
+    "99acres.com",
+    "swiggy.com",
+    "zomato.com",
+    "tripadvisor.com",
+    "practo.com",
+    "lybrate.com",
+    "makemytrip.com",
+    "goibibo.com",
+]
+
+# Browser settings
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+PAGE_LOCALE = "en-IN"
+DEFAULT_SCROLL_COUNT = 8  # How many scrolls to execute per search query
+DEFAULT_TIMEOUT_MS = 25000
+

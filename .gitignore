@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Mac OS
+.DS_Store
+
+# Scraper Database & Local cache
+# (Comment out if you wish to track the local database)
+*.db-journal
