@@ -100,7 +100,12 @@ gcloud run deploy varanasi-scraper \
 
 ---
 
-## 🔒 Notes on Data Persistence in Cloud Run
-- Google Cloud Run instances are stateless. When Cloud Run scales down to 0, locally stored files reset.
-- However, every time you trigger a scrape from the UI, the generated `.xlsx` file is immediately streamed and available for instant download on the webpage.
-- If you need long-term persistent storage of the master SQLite database in the cloud, you can mount a **Google Cloud Storage (GCS) bucket** as a volume or connect to **Cloud SQL**.
+## 🚀 4. Automated CI/CD Deployment to Google Cloud VM (Compute Engine)
+
+Automate deployments directly from GitHub using GitHub Actions every time you push changes to `main`.
+
+### Architecture:
+- **Cloud VM**: `instance-20261021-194042` (`34.131.108.87`) in `asia-south2-b`
+- **Systemd Service**: `varanasi-scraper.service` keeping `server.py` running 24/7 on port 8080
+- **CI/CD Pipeline**: `.github/workflows/deploy.yml` pulls latest commits, updates dependencies, and restarts the service.
+

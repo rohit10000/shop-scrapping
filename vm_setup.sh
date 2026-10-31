@@ -64,3 +64,4 @@ echo " Service Status:"
 sudo systemctl status varanasi-scraper --no-pager
 echo "=========================================================="
 echo " Next step: Make sure port 8080 is allowed in GCP Firewall!"
+

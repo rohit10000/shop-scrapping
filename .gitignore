@@ -17,4 +17,6 @@ env/
 # Scraper Database & Local cache
 # (Comment out if you wish to track the local database)
 *.db-journal
+server.log
+downloads/
 

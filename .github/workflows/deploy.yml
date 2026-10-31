@@ -1,0 +1,49 @@
+name: Deploy to Google Cloud VM
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to GCE Instance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Compute Engine via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.GCE_HOST }}
+          username: ${{ secrets.GCE_USERNAME }}
+          key: ${{ secrets.GCE_SSH_KEY }}
+          port: ${{ secrets.GCE_PORT || 22 }}
+          script: |
+            set -e
+            DEPLOY_DIR="${{ secrets.GCE_APP_DIR || '~/shop-scrapping' }}"
+            # Expand tilde if present
+            DEPLOY_DIR="${DEPLOY_DIR/#\~/$HOME}"
+
+            echo "🚀 Deploying to $DEPLOY_DIR on $(hostname)..."
+            cd "$DEPLOY_DIR"
+
+            echo "📥 Pulling latest changes from Git..."
+            git pull origin main
+
+            echo "📦 Updating Python dependencies..."
+            if [ -f .venv/bin/activate ]; then
+              source .venv/bin/activate
+            fi
+            pip install -r requirements.txt
+
+            echo "🔄 Restarting systemd service..."
+            sudo systemctl restart varanasi-scraper
+
+            echo "🔍 Verifying service status..."
+            sudo systemctl is-active --quiet varanasi-scraper
+            echo "✅ Successfully deployed! Varanasi Shop Scraper is running."
+

@@ -20,3 +20,4 @@ EXPOSE 8080
 
 # Run the FastAPI server on Cloud Run's dynamic PORT
 CMD ["python", "server.py"]
+
