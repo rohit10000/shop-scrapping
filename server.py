@@ -93,12 +93,17 @@ async def execute_scrape_task(job: JobState) -> None:
 
     job.status = "running"
     await job.queue.put({
+        "type": "log",
+        "message": f"🚀 Starting scraper session for {len(job.localities)} localities: {', '.join(job.localities[:5])}..."
+    })
+    await job.queue.put({
         "type": "status",
         "message": f"Starting browser session for {len(job.localities)} localities..."
     })
 
     try:
         await scraper.start()
+        await job.queue.put({"type": "log", "message": "🌐 Playwright Chromium headless browser launched successfully."})
 
         # Determine categories to sweep
         if job.exhaustive:
@@ -110,6 +115,7 @@ async def execute_scrape_task(job: JobState) -> None:
         current_step = 0
 
         for loc_idx, locality in enumerate(job.localities):
+            await job.queue.put({"type": "log", "message": f"📍 [{loc_idx+1}/{len(job.localities)}] Moving to locality: {locality}"})
             for cat_key in category_keys:
                 current_step += 1
                 progress_percent = int((current_step / max(1, total_steps)) * 100)
@@ -122,6 +128,7 @@ async def execute_scrape_task(job: JobState) -> None:
                         "percent": min(95, progress_percent),
                         "message": f"Scraping [{loc_idx+1}/{len(job.localities)}] {locality}: '{query}'"
                     })
+                    await job.queue.put({"type": "log", "message": f"🔍 Searching Google Maps: '{query}'..."})
 
                     async for raw_shop in scraper.scrape_query(
                         query=query,
@@ -159,6 +166,10 @@ async def execute_scrape_task(job: JobState) -> None:
                             "type": "shop_found",
                             "shop": full_record
                         })
+                        await job.queue.put({
+                            "type": "log",
+                            "message": f"  ✓ [{full_record['lead_priority']}] {full_record['name']} | {full_record['website_status']}"
+                        })
 
                     await asyncio.sleep(0.5)
 
@@ -174,6 +185,7 @@ async def execute_scrape_task(job: JobState) -> None:
         LeadExporter.export_to_excel(all_leads, str(BASE_DIR / "varanasi_shop_leads.xlsx"))
 
         job.status = "completed"
+        await job.queue.put({"type": "log", "message": f"🎉 Finished! Total: {job.total_shops} shops. Excel spreadsheet generated."})
         await job.queue.put({
             "type": "complete",
             "total_shops": job.total_shops,
@@ -252,3 +264,4 @@ async def download_leads(job_id: str) -> FileResponse:
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
+
