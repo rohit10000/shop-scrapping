@@ -43,7 +43,22 @@ playwright install chromium
 
 ---
 
-## 💻 Usage Commands
+## 🖥️ Web Dashboard UI (Option A)
+
+You can launch the web dashboard locally with:
+```bash
+python server.py
+```
+Open **`http://localhost:8080`** in your browser.
+
+- Interactive tag search for all **81 Varanasi localities**.
+- Real-time progress bar and live streaming shop detection.
+- One-click **"Download Excel (.xlsx)"** button.
+- Deployable to **Google Cloud Run** via `./deploy.sh` (see [DEPLOYMENT_GUIDE.md](file:///Users/shwetasingh/Development/varanasi-shop-website/shop-scrapping/DEPLOYMENT_GUIDE.md)).
+
+---
+
+## 💻 CLI Usage Commands
 
 ### 1. Interactive Selection Wizard
 Launch the guided interactive CLI:

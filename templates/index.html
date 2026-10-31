@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Varanasi Shop Scraper & Lead Generator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-500 p-2 rounded-lg text-white">
+          <i data-lucide="store" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">Varanasi Shop Scraper</h1>
+          <p class="text-xs text-indigo-200">Local Business Lead Generation Engine</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span class="w-2 h-2 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+          Ready
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- Top Grid: Selection & Config -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Locality Selection Panel (2 Cols) -->
+      <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i>
+              Select Varanasi Localities
+            </h2>
+            <p class="text-sm text-slate-500">Pick one or more markets to scrape</p>
+          </div>
+          <span id="selectedCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            0 selected
+          </span>
+        </div>
+
+        <!-- Quick selection buttons & Search -->
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+          <button type="button" id="btnTop10" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition">
+            Top 10 Markets
+          </button>
+          <button type="button" id="btnSelectAll" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+            Select All (81)
+          </button>
+          <button type="button" id="btnClearAll" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-rose-600 transition">
+            Clear
+          </button>
+          <div class="flex-1 min-w-[180px]">
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+              <input type="text" id="localitySearch" placeholder="Search locality (e.g. Lanka, Sigra)..." 
+                class="w-full text-xs pl-9 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Pills -->
+        <div id="selectedPillsContainer" class="flex flex-wrap gap-1.5 mb-3 min-h-[32px] p-2 bg-slate-50 rounded-lg border border-slate-100 custom-scrollbar max-h-24 overflow-y-auto">
+          <span class="text-xs text-slate-400 italic">No localities selected yet. Click from the list below.</span>
+        </div>
+
+        <!-- Locality Checkbox Grid -->
+        <div class="flex-1 border border-slate-200 rounded-lg p-3 custom-scrollbar max-h-64 overflow-y-auto bg-slate-50/50">
+          <div id="localityGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            <!-- Locality tags populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Scraper Settings Panel (1 Col) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between">
+        <div class="space-y-5">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-indigo-600"></i>
+            Scraping Configuration
+          </h2>
+
+          <!-- Mode -->
+          <div class="space-y-2">
+            <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Search Coverage</label>
+            <div class="space-y-2">
+              <label class="flex items-start p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/40">
+                <input type="radio" name="searchMode" value="standard" checked class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                <div class="ml-3">
+                  <span class="text-sm font-medium text-slate-900 block">General Sweep</span>
+                  <span class="text-xs text-slate-500 block">Fast sweep of general shops & stores (~20-40 leads/locality)</span>
+                </div>
+              </label>
+
+              <label class="flex items-start p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50/40">
+                <input type="radio" name="searchMode" value="exhaustive" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                <div class="ml-3">
+                  <span class="text-sm font-medium text-slate-900 block">Exhaustive Census</span>
+                  <span class="text-xs text-slate-500 block">Loops all categories: toys, medical, grocery, clothing, sweets, jewelry, etc.</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Scroll Depth -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-semibold text-slate-700 uppercase tracking-wider">Scroll Depth</span>
+              <span id="scrollVal" class="font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">6 scrolls</span>
+            </div>
+            <input type="range" id="scrollInput" min="2" max="15" value="6" step="1" 
+              class="w-full accent-indigo-600 cursor-pointer">
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>Faster (2)</span>
+              <span>Balanced (6)</span>
+              <span>Maximum (15)</span>
+            </div>
+          </div>
+
+          <!-- Deep Verification -->
+          <div class="pt-2 border-t border-slate-100">
+            <label class="flex items-center space-x-2 cursor-pointer">
+              <input type="checkbox" id="deepVerifyCheck" checked class="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+              <span class="text-xs font-medium text-slate-700">Deep Place-Page Website Verification</span>
+            </label>
+            <p class="text-[11px] text-slate-500 ml-6 mt-0.5">Visits place page to prevent false negatives (like Kambal Ghar).</p>
+          </div>
+        </div>
+
+        <!-- Start Button -->
+        <div class="mt-6 pt-4 border-t border-slate-200">
+          <button type="button" id="btnStartScrape" 
+            class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-sm hover:shadow transition flex items-center justify-center gap-2">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            <span>Start Scraping Selected Localities</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Execution & Metrics Panel (Initially Hidden) -->
+    <div id="liveSection" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+      
+      <!-- Progress Bar & Status -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-sm">
+          <div class="flex items-center gap-2">
+            <span id="spinnerIcon" class="animate-spin text-indigo-600 inline-block">
+              <i data-lucide="loader-2" class="w-5 h-5"></i>
+            </span>
+            <span id="statusMessage" class="font-medium text-slate-800">Initializing scraper session...</span>
+          </div>
+          <span id="progressPercent" class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded">0%</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Live Counters -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Total Scraped</span>
+          <span id="counterTotal" class="text-2xl font-bold text-slate-800 mt-1 block">0</span>
+        </div>
+        <div class="bg-emerald-50/60 p-4 rounded-xl border border-emerald-100">
+          <span class="text-xs font-medium text-emerald-700 uppercase tracking-wider block">🔥 High Priority</span>
+          <span id="counterHigh" class="text-2xl font-bold text-emerald-800 mt-1 block">0</span>
+        </div>
+        <div class="bg-rose-50/60 p-4 rounded-xl border border-rose-100">
+          <span class="text-xs font-medium text-rose-700 uppercase tracking-wider block">🔴 No Website</span>
+          <span id="counterNoWeb" class="text-2xl font-bold text-rose-800 mt-1 block">0</span>
+        </div>
+        <div class="bg-blue-50/60 p-4 rounded-xl border border-blue-100">
+          <span class="text-xs font-medium text-blue-700 uppercase tracking-wider block">📞 With Direct Phone</span>
+          <span id="counterPhone" class="text-2xl font-bold text-blue-800 mt-1 block">0</span>
+        </div>
+      </div>
+
+      <!-- Action Button Area (Becomes prominent on finish) -->
+      <div id="downloadBanner" class="hidden p-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-white/20 rounded-lg">
+            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base">Scraping Completed Successfully!</h3>
+            <p class="text-xs text-emerald-100">Your curated leads with 1-click WhatsApp links are ready.</p>
+          </div>
+        </div>
+        <a id="btnDownloadExcel" href="#" download 
+          class="inline-flex items-center gap-2 bg-white text-emerald-700 hover:bg-emerald-50 font-bold px-5 py-2.5 rounded-lg shadow transition transform hover:-translate-y-0.5">
+          <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+          <span>Download Excel (.xlsx)</span>
+        </a>
+      </div>
+
+      <!-- Live Stream Table -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="table" class="w-4 h-4 text-indigo-600"></i>
+            Live Discovered Shops
+          </h3>
+          <span class="text-xs text-slate-400">Streaming real-time results</span>
+        </div>
+        <div class="border border-slate-200 rounded-lg overflow-hidden custom-scrollbar max-h-96 overflow-y-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-xs text-left">
+            <thead class="bg-slate-50 sticky top-0 text-slate-600 font-semibold">
+              <tr>
+                <th class="px-4 py-3">Shop Name</th>
+                <th class="px-3 py-3">Locality</th>
+                <th class="px-3 py-3">Category</th>
+                <th class="px-3 py-3">Phone</th>
+                <th class="px-3 py-3">Reviews</th>
+                <th class="px-3 py-3">Website Status</th>
+                <th class="px-3 py-3">Priority</th>
+                <th class="px-3 py-3">Action</th>
+              </tr>
+            </thead>
+            <tbody id="liveTableBody" class="divide-y divide-slate-100 bg-white">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+      Varanasi Shop Lead Generation Tool • Playwright Google Maps Engine
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    let allLocalities = [];
+    let selectedLocalities = new Set();
+    let currentEventSource = null;
+
+    const TOP_10_LOCALITIES = [
+      "Lanka", "Sigra", "Durgakund", "Assi", "Bhelupur", 
+      "Godowlia", "Chowk", "Mahmoorganj", "Rathyatra", "Pandeypur"
+    ];
+
+    // Initialize Icons
+    lucide.createIcons();
+
+    // Fetch Localities
+    async function init() {
+      try {
+        const resp = await fetch('/api/localities');
+        const data = await resp.json();
+        allLocalities = data.localities || [];
+        renderLocalityGrid();
+        // Default select top 3
+        selectLocality("Lanka");
+        selectLocality("Sigra");
+        selectLocality("Durgakund");
+      } catch (err) {
+        console.error("Failed to fetch localities:", err);
+      }
+    }
+
+    // Render Checkbox Grid
+    function renderLocalityGrid(filterText = "") {
+      const grid = document.getElementById('localityGrid');
+      grid.innerHTML = "";
+
+      const filtered = allLocalities.filter(l => 
+        l.toLowerCase().includes(filterText.toLowerCase().trim())
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<span class="col-span-full text-xs text-slate-400 text-center py-4">No localities match "${filterText}"</span>`;
+        return;
+      }
+
+      filtered.forEach(loc => {
+        const isChecked = selectedLocalities.has(loc);
+        const card = document.createElement('label');
+        card.className = `flex items-center space-x-2 p-2 rounded text-xs cursor-pointer transition select-none ${
+          isChecked ? 'bg-indigo-50 text-indigo-900 font-semibold border border-indigo-200' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/60'
+        }`;
+        
+        card.innerHTML = `
+          <input type="checkbox" value="${loc}" ${isChecked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5">
+          <span class="truncate">${loc}</span>
+        `;
+
+        card.querySelector('input').addEventListener('change', (e) => {
+          if (e.target.checked) {
+            selectLocality(loc);
+          } else {
+            deselectLocality(loc);
+          }
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    function selectLocality(loc) {
+      selectedLocalities.add(loc);
+      updateSelectionUI();
+    }
+
+    function deselectLocality(loc) {
+      selectedLocalities.delete(loc);
+      updateSelectionUI();
+    }
+
+    function updateSelectionUI() {
+      // Update badge
+      document.getElementById('selectedCountBadge').innerText = `${selectedLocalities.size} selected`;
+
+      // Update pills
+      const pillsContainer = document.getElementById('selectedPillsContainer');
+      pillsContainer.innerHTML = "";
+
+      if (selectedLocalities.size === 0) {
+        pillsContainer.innerHTML = `<span class="text-xs text-slate-400 italic">No localities selected yet. Click from the list below.</span>`;
+      } else {
+        selectedLocalities.forEach(loc => {
+          const pill = document.createElement('span');
+          pill.className = "inline-flex items-center gap-1 bg-indigo-100 text-indigo-800 text-xs px-2.5 py-1 rounded-full font-medium shadow-2xs";
+          pill.innerHTML = `
+            <span>${loc}</span>
+            <button type="button" class="text-indigo-500 hover:text-indigo-800 ml-0.5 focus:outline-none">&times;</button>
+          `;
+          pill.querySelector('button').addEventListener('click', () => {
+            deselectLocality(loc);
+            renderLocalityGrid(document.getElementById('localitySearch').value);
+          });
+          pillsContainer.appendChild(pill);
+        });
+      }
+
+      // Re-render grid to update checked states
+      renderLocalityGrid(document.getElementById('localitySearch').value);
+    }
+
+    // Quick Action Handlers
+    document.getElementById('btnTop10').addEventListener('click', () => {
+      selectedLocalities.clear();
+      TOP_10_LOCALITIES.forEach(l => selectedLocalities.add(l));
+      updateSelectionUI();
+    });
+
+    document.getElementById('btnSelectAll').addEventListener('click', () => {
+      allLocalities.forEach(l => selectedLocalities.add(l));
+      updateSelectionUI();
+    });
+
+    document.getElementById('btnClearAll').addEventListener('click', () => {
+      selectedLocalities.clear();
+      updateSelectionUI();
+    });
+
+    document.getElementById('localitySearch').addEventListener('input', (e) => {
+      renderLocalityGrid(e.target.value);
+    });
+
+    // Scroll depth input sync
+    const scrollInput = document.getElementById('scrollInput');
+    const scrollVal = document.getElementById('scrollVal');
+    scrollInput.addEventListener('input', (e) => {
+      scrollVal.innerText = `${e.target.value} scrolls`;
+    });
+
+    // Start Scraping
+    const btnStart = document.getElementById('btnStartScrape');
+    btnStart.addEventListener('click', async () => {
+      if (selectedLocalities.size === 0) {
+        alert("Please select at least one locality.");
+        return;
+      }
+
+      const localitiesArr = Array.from(selectedLocalities);
+      const isExhaustive = document.querySelector('input[name="searchMode"]:checked').value === 'exhaustive';
+      const scrolls = parseInt(scrollInput.value, 10);
+      const deepVerify = document.getElementById('deepVerifyCheck').checked;
+
+      // Lock UI
+      btnStart.disabled = true;
+      btnStart.classList.add('opacity-50');
+
+      // Reset Live Display
+      document.getElementById('liveSection').classList.remove('hidden');
+      document.getElementById('downloadBanner').classList.add('hidden');
+      document.getElementById('liveTableBody').innerHTML = "";
+      document.getElementById('progressBar').style.width = "0%";
+      document.getElementById('progressPercent').innerText = "0%";
+      document.getElementById('statusMessage').innerText = "Starting scraper job...";
+      document.getElementById('spinnerIcon').classList.remove('hidden');
+
+      // Counters
+      let totalCount = 0;
+      let highCount = 0;
+      let noWebCount = 0;
+      let phoneCount = 0;
+
+      document.getElementById('counterTotal').innerText = "0";
+      document.getElementById('counterHigh').innerText = "0";
+      document.getElementById('counterNoWeb').innerText = "0";
+      document.getElementById('counterPhone').innerText = "0";
+
+      // Scroll to live section
+      document.getElementById('liveSection').scrollIntoView({ behavior: 'smooth' });
+
+      try {
+        const resp = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            localities: localitiesArr,
+            exhaustive: isExhaustive,
+            scrolls: scrolls,
+            deep_verify: deepVerify
+          })
+        });
+
+        const data = await resp.json();
+        const jobId = data.job_id;
+
+        // Connect SSE stream
+        if (currentEventSource) {
+          currentEventSource.close();
+        }
+
+        currentEventSource = new EventSource(`/api/jobs/${jobId}/stream`);
+
+        currentEventSource.onmessage = (event) => {
+          const ev = JSON.parse(event.data);
+
+          if (ev.type === 'status') {
+            document.getElementById('statusMessage').innerText = ev.message;
+          } else if (ev.type === 'progress') {
+            document.getElementById('progressBar').style.width = `${ev.percent}%`;
+            document.getElementById('progressPercent').innerText = `${ev.percent}%`;
+            document.getElementById('statusMessage').innerText = ev.message;
+          } else if (ev.type === 'shop_found') {
+            const s = ev.shop;
+            totalCount++;
+            if (s.lead_priority === 'HIGH') highCount++;
+            if (s.website_status === 'NO_WEBSITE') noWebCount++;
+            if (s.phone) phoneCount++;
+
+            document.getElementById('counterTotal').innerText = totalCount;
+            document.getElementById('counterHigh').innerText = highCount;
+            document.getElementById('counterNoWeb').innerText = noWebCount;
+            document.getElementById('counterPhone').innerText = phoneCount;
+
+            appendShopRow(s);
+          } else if (ev.type === 'complete') {
+            currentEventSource.close();
+            document.getElementById('progressBar').style.width = "100%";
+            document.getElementById('progressPercent').innerText = "100%";
+            document.getElementById('statusMessage').innerText = `Finished! Processed ${ev.total_shops} shops.`;
+            document.getElementById('spinnerIcon').classList.add('hidden');
+
+            // Show download banner
+            const btnDownload = document.getElementById('btnDownloadExcel');
+            btnDownload.href = ev.download_url;
+            document.getElementById('downloadBanner').classList.remove('hidden');
+
+            btnStart.disabled = false;
+            btnStart.classList.remove('opacity-50');
+            lucide.createIcons();
+          } else if (ev.type === 'error') {
+            currentEventSource.close();
+            document.getElementById('statusMessage').innerText = `Error: ${ev.message}`;
+            document.getElementById('spinnerIcon').classList.add('hidden');
+            btnStart.disabled = false;
+            btnStart.classList.remove('opacity-50');
+          }
+        };
+
+        currentEventSource.onerror = () => {
+          console.error("SSE connection closed or lost.");
+        };
+
+      } catch (err) {
+        alert("Failed to start scraper: " + err);
+        btnStart.disabled = false;
+        btnStart.classList.remove('opacity-50');
+      }
+    });
+
+    function appendShopRow(s) {
+      const tbody = document.getElementById('liveTableBody');
+      const tr = document.createElement('tr');
+      tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+
+      // Priority Badge
+      let priorityBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-600">LOW</span>`;
+      if (s.lead_priority === 'HIGH') {
+        priorityBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">HIGH</span>`;
+      } else if (s.lead_priority === 'MEDIUM') {
+        priorityBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">MED</span>`;
+      }
+
+      // Status Badge
+      let statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">${s.website_status}</span>`;
+      if (s.website_status === 'NO_WEBSITE') {
+        statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-800">NO WEBSITE</span>`;
+      } else if (s.website_status === 'ACTIVE_WEBSITE') {
+        statusBadge = `<a href="${s.website_url}" target="_blank" class="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 hover:underline">Active Site</a>`;
+      } else if (s.website_status === 'SOCIAL_ONLY') {
+        statusBadge = `<span class="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-100 text-blue-800">Social Only</span>`;
+      }
+
+      // WhatsApp Button
+      let actionBtn = `<span class="text-slate-300">-</span>`;
+      if (s.whatsapp_link) {
+        actionBtn = `
+          <a href="${s.whatsapp_link}" target="_blank" title="Open WhatsApp Chat" 
+            class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+            <span>WhatsApp</span>
+          </a>
+        `;
+      }
+
+      tr.innerHTML = `
+        <td class="px-4 py-2.5 font-medium text-slate-900 max-w-[200px] truncate" title="${s.name}">${s.name}</td>
+        <td class="px-3 py-2.5 text-slate-600">${s.locality}</td>
+        <td class="px-3 py-2.5 text-slate-500 max-w-[140px] truncate" title="${s.category}">${s.category}</td>
+        <td class="px-3 py-2.5 font-mono text-slate-700">${s.phone || '<span class="text-slate-300">None</span>'}</td>
+        <td class="px-3 py-2.5 text-slate-600">${s.rating ? s.rating + '★ (' + s.reviews_count + ')' : '-'}</td>
+        <td class="px-3 py-2.5">${statusBadge}</td>
+        <td class="px-3 py-2.5">${priorityBadge}</td>
+        <td class="px-3 py-2.5">${actionBtn}</td>
+      `;
+
+      tbody.insertBefore(tr, tbody.firstChild);
+      lucide.createIcons();
+    }
+
+    // Run Init
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

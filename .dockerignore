@@ -1,0 +1,12 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+.git/
+.gitignore
+*.log
+downloads/
+varanasi_shops.db-journal
