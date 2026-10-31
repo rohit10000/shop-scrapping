@@ -92,18 +92,45 @@ class GoogleMapsScraper:
                     return clean_phone
         return None
 
+    async def verify_place_website(self, maps_url: str, page: Optional[Page] = None) -> Optional[str]:
+        """Directly check place page if website was omitted from the compact feed card."""
+        if not maps_url:
+            return None
+        close_page = False
+        if not page:
+            if not self._context:
+                await self.start()
+            page = await self._context.new_page()
+            close_page = True
+        try:
+            await page.goto(maps_url, wait_until="domcontentloaded", timeout=12000)
+            el = await page.wait_for_selector(
+                'a[data-item-id="authority"], a[aria-label*="Website:" i], a[aria-label*="Open website" i]',
+                timeout=2500
+            )
+            if el:
+                return await el.get_attribute("href")
+        except Exception:
+            pass
+        finally:
+            if close_page:
+                await page.close()
+        return None
+
     async def scrape_query(
         self,
         query: str,
         locality: str,
         category_hint: str = "",
         scroll_count: int = DEFAULT_SCROLL_COUNT,
+        deep_verify: bool = True,
     ) -> AsyncGenerator[Dict, None]:
         """Scrape all shops returned by Google Maps for a given query."""
         if not self._context:
             await self.start()
 
         page: Page = await self._context.new_page()
+        worker_page: Optional[Page] = await self._context.new_page() if deep_verify else None
         encoded_query = urllib.parse.quote_plus(query)
         url = f"https://www.google.com/maps/search/{encoded_query}"
 
@@ -175,6 +202,10 @@ class GoogleMapsScraper:
                 link_el = await card.query_selector('a.hfpxzc')
                 maps_url = await link_el.get_attribute('href') if link_el else ""
 
+                # Deep verify website from place page if Google Maps omitted the button from card
+                if not website_url and deep_verify and maps_url and worker_page:
+                    website_url = await self.verify_place_website(maps_url, worker_page)
+
                 # Card textual content
                 raw_text = await card.inner_text()
                 lines = [l.strip() for l in raw_text.split("\n") if l.strip()]
@@ -200,6 +231,8 @@ class GoogleMapsScraper:
                 }
 
         finally:
+            if worker_page:
+                await worker_page.close()
             await page.close()
 
     async def _parse_single_place(
